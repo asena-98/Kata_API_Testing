@@ -174,29 +174,57 @@ public class BookingSteps {
         response.then().statusCode(403);
     }
 
+    @When("I submit a booking request with an invalid email format")
+    public void iSubmitABookingRequestWithAnInvalidEmailFormat() throws IOException {
+        for (int attempt = 0; attempt < 10; attempt++) {
+            String bookingJson = buildInvalidEmailBookingJsonWithRandomDates();
+
+            response = bookingApi.createBooking(bookingJson);
+
+            if (response.getStatusCode() != 409) {
+                return;
+            }
+        }
+    }
+
+    @Then("the booking should not be created")
+    public void theBookingShouldNotBeCreated() {
+        response.then().statusCode(400);
+    }
+
     private String buildValidBookingJsonWithRandomDates() throws IOException {
-        String bookingJson = Files.readString(
-                Path.of("src/test/resources/testdata/bookings/valid-booking.json"));
+        String bookingJson = Files
+                .readString(Path.of("src/test/resources/testdata/bookings/valid-booking.json"));
 
         int daysToAdd = ThreadLocalRandom.current().nextInt(365, 20000);
         LocalDate checkin = LocalDate.now().plusDays(daysToAdd);
         LocalDate checkout = checkin.plusDays(2);
 
-        return bookingJson
-                .replace("${checkin}", checkin.toString())
-                .replace("${checkout}", checkout.toString());
+        return bookingJson.replace("${checkin}", checkin.toString()).replace("${checkout}",
+                checkout.toString());
     }
 
     private String buildUpdatedBookingJsonWithRandomDates() throws IOException {
-        String bookingJson = Files.readString(
-                Path.of("src/test/resources/testdata/bookings/updated-booking.json"));
+        String bookingJson = Files
+                .readString(Path.of("src/test/resources/testdata/bookings/updated-booking.json"));
 
         int daysToAdd = ThreadLocalRandom.current().nextInt(365, 20000);
         LocalDate checkin = LocalDate.now().plusDays(daysToAdd);
         LocalDate checkout = checkin.plusDays(2);
 
-        return bookingJson
-                .replace("${checkin}", checkin.toString())
-                .replace("${checkout}", checkout.toString());
+        return bookingJson.replace("${checkin}", checkin.toString()).replace("${checkout}",
+                checkout.toString());
+    }
+
+    private String buildInvalidEmailBookingJsonWithRandomDates() throws IOException {
+        String bookingJson = Files.readString(
+                Path.of("src/test/resources/testdata/bookings/invalid-email-booking.json"));
+
+        int daysToAdd = ThreadLocalRandom.current().nextInt(365, 20000);
+        LocalDate checkin = LocalDate.now().plusDays(daysToAdd);
+        LocalDate checkout = checkin.plusDays(2);
+
+        return bookingJson.replace("${checkin}", checkin.toString()).replace("${checkout}",
+                checkout.toString());
     }
 }

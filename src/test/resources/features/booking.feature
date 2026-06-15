@@ -37,5 +37,8 @@ Feature: Booking API
     When I request the booking details without an authentication token
     Then the booking details should not be returned
     
+  Scenario: Prevent booking creation with an invalid email format
+    When I submit a booking request with an invalid email format
+    Then the booking should not be created
 
   
