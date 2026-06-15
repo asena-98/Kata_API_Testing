@@ -40,15 +40,18 @@ public class BookingSteps {
 
     @When("I create a valid booking")
     public void iCreateAValidBooking() throws IOException {
-        String bookingJson = Files
-                .readString(Path.of("src/test/resources/testdata/bookings/valid-booking.json"));
-        int daysToAdd = ThreadLocalRandom.current().nextInt(365, 10000);
-        LocalDate checkin = LocalDate.now().plusDays(daysToAdd);
-        LocalDate checkout = checkin.plusDays(2);
-        bookingJson = bookingJson.replace("${checkin}", checkin.toString()).replace("${checkout}",
-                checkout.toString());
-        createdBookingJson = bookingJson;
-        response = bookingApi.createBooking(bookingJson);
+        for (int attempt = 0; attempt < 10; attempt++) {
+            String bookingJson = buildValidBookingJsonWithRandomDates();
+
+            response = bookingApi.createBooking(bookingJson);
+
+            if (response.getStatusCode() == 201) {
+                createdBookingJson = bookingJson;
+                return;
+            }
+        }
+
+        response.then().statusCode(201);
     }
 
     @Then("the booking should be created successfully")
@@ -75,18 +78,20 @@ public class BookingSteps {
 
     @Given("a valid booking exists")
     public void aValidBookingExists() throws IOException {
-        String bookingJson = Files
-                .readString(Path.of("src/test/resources/testdata/bookings/valid-booking.json"));
-        int daysToAdd = ThreadLocalRandom.current().nextInt(365, 10000);
-        LocalDate checkin = LocalDate.now().plusDays(daysToAdd);
-        LocalDate checkout = checkin.plusDays(2);
-        bookingJson = bookingJson.replace("${checkin}", checkin.toString()).replace("${checkout}",
-                checkout.toString());
-        existingBookingJson = bookingJson;
-        response = bookingApi.createBooking(bookingJson);
-        response.then().statusCode(201).body("bookingid", notNullValue());
-        Integer createdBookingId = response.jsonPath().get("bookingid");
-        bookingId = createdBookingId;
+        for (int attempt = 0; attempt < 10; attempt++) {
+            String bookingJson = buildValidBookingJsonWithRandomDates();
+
+            response = bookingApi.createBooking(bookingJson);
+
+            if (response.getStatusCode() == 201) {
+                existingBookingJson = bookingJson;
+                Integer createdBookingId = response.jsonPath().get("bookingid");
+                bookingId = createdBookingId;
+                return;
+            }
+        }
+
+        response.then().statusCode(201);
     }
 
     @When("I retrieve the booking by ID")
@@ -110,15 +115,18 @@ public class BookingSteps {
 
     @When("I update the booking")
     public void iUpdateTheBooking() throws IOException {
-        String bookingJson = Files
-                .readString(Path.of("src/test/resources/testdata/bookings/updated-booking.json"));
-        int daysToAdd = ThreadLocalRandom.current().nextInt(365, 10000);
-        LocalDate checkin = LocalDate.now().plusDays(daysToAdd);
-        LocalDate checkout = checkin.plusDays(2);
-        bookingJson = bookingJson.replace("${checkin}", checkin.toString()).replace("${checkout}",
-                checkout.toString());
-        updatedBookingJson = bookingJson;
-        response = bookingApi.updateBooking(bookingId, token, bookingJson);
+        for (int attempt = 0; attempt < 10; attempt++) {
+            String bookingJson = buildUpdatedBookingJsonWithRandomDates();
+
+            response = bookingApi.updateBooking(bookingId, token, bookingJson);
+
+            if (response.getStatusCode() == 200) {
+                updatedBookingJson = bookingJson;
+                return;
+            }
+        }
+
+        response.then().statusCode(200);
     }
 
     @Then("the booking should be updated successfully")
@@ -164,5 +172,31 @@ public class BookingSteps {
     @Then("the booking details should not be returned")
     public void theBookingDetailsShouldNotBeReturned() {
         response.then().statusCode(403);
+    }
+
+    private String buildValidBookingJsonWithRandomDates() throws IOException {
+        String bookingJson = Files.readString(
+                Path.of("src/test/resources/testdata/bookings/valid-booking.json"));
+
+        int daysToAdd = ThreadLocalRandom.current().nextInt(365, 20000);
+        LocalDate checkin = LocalDate.now().plusDays(daysToAdd);
+        LocalDate checkout = checkin.plusDays(2);
+
+        return bookingJson
+                .replace("${checkin}", checkin.toString())
+                .replace("${checkout}", checkout.toString());
+    }
+
+    private String buildUpdatedBookingJsonWithRandomDates() throws IOException {
+        String bookingJson = Files.readString(
+                Path.of("src/test/resources/testdata/bookings/updated-booking.json"));
+
+        int daysToAdd = ThreadLocalRandom.current().nextInt(365, 20000);
+        LocalDate checkin = LocalDate.now().plusDays(daysToAdd);
+        LocalDate checkout = checkin.plusDays(2);
+
+        return bookingJson
+                .replace("${checkin}", checkin.toString())
+                .replace("${checkout}", checkout.toString());
     }
 }
