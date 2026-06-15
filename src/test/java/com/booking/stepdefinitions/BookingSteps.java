@@ -197,5 +197,19 @@ public class BookingSteps {
                 .body("booking.depositpaid", equalTo(false));
 
     }
+
+    @When("I delete the booking")
+
+    public void iDeleteTheBooking() {
+
+        response = bookingApi.deleteBooking(bookingId, token);
+    }
+
+    @Then("the booking should be deleted successfully")
+
+    public void theBookingShouldBeDeletedSuccessfully() {
+
+        response.then().statusCode(202);
+    }
 }
 

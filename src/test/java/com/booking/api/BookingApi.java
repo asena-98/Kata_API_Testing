@@ -73,4 +73,18 @@ public class BookingApi {
 
                 .put(BOOKING_PATH + "/" + bookingId);
     }
+
+    public Response deleteBooking(int bookingId, String token) {
+
+        return given()
+
+                .baseUri(BASE_URL)
+
+                .cookie("token", token)
+
+                .when()
+
+                .delete(BOOKING_PATH + "/" + bookingId);
+
+    }
 }

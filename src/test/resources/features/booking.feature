@@ -35,3 +35,14 @@ Feature: Booking API
     When I update the booking
 
     Then the booking should be updated successfully
+
+
+  Scenario: Delete an existing booking 
+
+    Given I am logged in as admin
+
+    And a valid booking exists
+
+    When I delete the booking
+
+    Then the booking should be deleted successfully
