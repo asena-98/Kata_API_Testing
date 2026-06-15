@@ -157,5 +157,45 @@ public class BookingSteps {
                 .body("bookingdates.checkout", notNullValue());
 
     }
+
+    @When("I update the booking")
+
+    public void iUpdateTheBooking() throws IOException {
+
+        String bookingJson = Files
+                .readString(Path.of("src/test/resources/testdata/bookings/updated-booking.json"));
+
+        long daysToAdd = 40 + (System.currentTimeMillis() % 1000);
+
+        LocalDate checkin = LocalDate.now().plusDays(daysToAdd);
+
+        LocalDate checkout = checkin.plusDays(2);
+
+        bookingJson = bookingJson
+
+                .replace("${checkin}", checkin.toString())
+
+                .replace("${checkout}", checkout.toString());
+
+
+        response = bookingApi.updateBooking(bookingId, token, bookingJson);
+
+    }
+
+    @Then("the booking should be updated successfully")
+
+    public void theBookingShouldBeUpdatedSuccessfully() {
+
+        response.then()
+
+                .statusCode(200)
+
+                .body("booking.firstname", equalTo("Updated"))
+
+                .body("booking.lastname", equalTo("Booking"))
+
+                .body("booking.depositpaid", equalTo(false));
+
+    }
 }
 

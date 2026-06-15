@@ -54,4 +54,23 @@ public class BookingApi {
                 .get(BOOKING_PATH + "/" + bookingId);
 
     }
+
+    public Response updateBooking(int bookingId, String token, String bookingJson) {
+
+        return given()
+
+                .baseUri(BASE_URL)
+
+                .header("Content-Type", "application/json")
+
+                .header("Accept", "application/json")
+
+                .cookie("token", token)
+
+                .body(bookingJson)
+
+                .when()
+
+                .put(BOOKING_PATH + "/" + bookingId);
+    }
 }

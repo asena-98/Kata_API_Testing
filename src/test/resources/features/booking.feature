@@ -24,3 +24,14 @@ Feature: Booking API
     When I retrieve the booking by ID
 
     Then the booking details should be returned
+    
+
+  Scenario: Update an entire booking 
+
+    Given I am logged in as admin
+
+    And a valid booking exists
+
+    When I update the booking
+
+    Then the booking should be updated successfully
