@@ -27,4 +27,15 @@ Feature: Booking API
     When I delete the booking
     Then the booking should be deleted successfully
 
+  Scenario: Prevent duplicate booking of the same room for the same dates
+    Given a valid booking exists
+    When I create another booking with the same room and date range
+    Then the duplicate booking should not be created 
+
+  Scenario: Prevent booking retrieval without authentication
+    Given a valid booking exists
+    When I request the booking details without an authentication token
+    Then the booking details should not be returned
+    
+
   

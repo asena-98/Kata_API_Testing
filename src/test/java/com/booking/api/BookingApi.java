@@ -39,4 +39,9 @@ public class BookingApi {
                 .delete(BOOKING_PATH + "/" + bookingId);
 
     }
+
+    public Response getBookingByIdWithoutAuthentication(int bookingId) {
+        return given().baseUri(BASE_URL).header("Accept", "application/json").when()
+                .get(BOOKING_PATH + "/" + bookingId);
+    }
 }
